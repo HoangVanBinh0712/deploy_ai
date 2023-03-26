@@ -9,7 +9,6 @@ from nltk.tokenize import word_tokenize
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
-from pydantic import BaseModel
 # %%
 app = FastAPI()
 # Load model trained
@@ -91,9 +90,3 @@ def clean_text(resume_text):
         return ' '.join(filtered_text)
     except:
         return ''
-
-
-if __name__ == '__main__':
-    uvicorn.run(app, host='127.0.0.1', port=8000)
-
-# %%
