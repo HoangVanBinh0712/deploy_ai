@@ -1,4 +1,5 @@
 # %%
+import os
 import uvicorn
 from fastapi import FastAPI
 import numpy as np
@@ -90,3 +91,9 @@ def clean_text(resume_text):
         return ' '.join(filtered_text)
     except:
         return ''
+
+
+if __name__ == '__main__':
+    uvicorn.run(app, host='127.0.0.1', port=int(os.environ.get("PORT", 5000)))
+
+# %%
