@@ -1,1 +1,1 @@
-web: gunicorn -w 4-k uvicorn.worlers.UnicornWorker app:app
+web: py -m uvicorn app:app --reload
