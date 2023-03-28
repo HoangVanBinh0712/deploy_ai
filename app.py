@@ -10,6 +10,8 @@ from nltk.tokenize import word_tokenize
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
+from pydantic import BaseModel
+
 # %%
 app = FastAPI()
 # Load model trained
@@ -25,29 +27,32 @@ stopwords_set = set(stopwords_set)
 max_length = 800
 trunc_type = 'post'
 pad_type = 'post'
+# load feature_tokenizer to transfer data to number array
+feature_tokenizer_in = open("feature_tokenizer.pickle", "rb")
+feature_tokenizer = pickle.load(feature_tokenizer_in)
+
+# Load the lable
+encoding_to_label_in = open("dictionary.pickle", "rb")
+encoding_to_label = pickle.load(encoding_to_label_in)
+
+class predictBody(BaseModel):
+    resume: str
+    skill: str
 
 
-@app.get('/predict')
-def predict_cv(resume: str, skill: str):
-    # clean data before convert to number
-    resume_data = clean_text(resume)
-    skill_data = clean_text(skill)
-    # load feature_tokenizer to transfer data to number array
-    feature_tokenizer_in = open("feature_tokenizer.pickle", "rb")
-    feature_tokenizer = pickle.load(feature_tokenizer_in)
+def transform(data: str):
+    clean_data = clean_text(data)
+    data_sequence = feature_tokenizer.texts_to_sequences([clean_data])
+    data_padded = pad_sequences(
+        data_sequence, maxlen=max_length, padding=pad_type, truncating=trunc_type)
+    return np.array(data_padded)
 
-    resume_sequence = feature_tokenizer.texts_to_sequences([resume_data])
-    skill_sequence = feature_tokenizer.texts_to_sequences([skill_data])
-    # padding 0 for number array until reach max_length length
-    resume_padded = pad_sequences(
-        resume_sequence, maxlen=max_length, padding=pad_type, truncating=trunc_type)
-    skill_padded = pad_sequences(
-        skill_sequence, maxlen=max_length, padding=pad_type, truncating=trunc_type)
-    # convert to numpy array
-    resume_padded = np.array(resume_padded)
-    skill_padded = np.array(skill_padded)
 
-    # print((resume_padded, skill_padded))
+@app.post('/predict')
+def predict_cv(predictBody: predictBody):
+    resume_padded = transform(predictBody.resume)
+    skill_padded = transform(predictBody.skill)
+
     # predict
     prediction = filterCV.predict((resume_padded, skill_padded))
 
@@ -56,20 +61,17 @@ def predict_cv(resume: str, skill: str):
     indices = indices[np.argsort(prediction[0][indices])]
     indices = list(reversed(indices))
 
-    # Load the lable
-    encoding_to_label_in = open("dictionary.pickle", "rb")
-    encoding_to_label = pickle.load(encoding_to_label_in)
 
     # Concat data to return
     result_data = []
     for index in indices:
         result_data.append({str(encoding_to_label[index]): str(
             round(prediction[0][index]*100, 2)) + "% "})
-    print(result_data)
+
     return JSONResponse(content=jsonable_encoder({"results": result_data}))
 
 
-@app.get('/home')
+@app.get('')
 def get_home():
     return {'message': 'Wellcome'}
 
