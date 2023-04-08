@@ -42,7 +42,7 @@ class predictBody(BaseModel):
 
 
 def transform(data: str):
-    print(feature_tokenizer)
+    print(data)
     clean_data = clean_text(data)
     print(clean_data)
     data_sequence = feature_tokenizer.texts_to_sequences([clean_data])
