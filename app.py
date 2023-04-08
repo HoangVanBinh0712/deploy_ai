@@ -6,7 +6,6 @@ import numpy as np
 from tensorflow import keras
 import pickle
 import re
-from nltk.tokenize import word_tokenize
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
@@ -17,13 +16,6 @@ app = FastAPI()
 # Load model trained
 filterCV = keras.models.load_model('models_P')
 # create global parameter
-gist_file = open("./stopword.txt", "r")
-try:
-    content = gist_file.read()
-    stopwords_set = content.split(",")
-finally:
-    gist_file.close()
-stopwords_set = set(stopwords_set)
 max_length = 800
 trunc_type = 'post'
 pad_type = 'post'
@@ -92,10 +84,7 @@ def clean_text(resume_text):
         resume_text = re.sub(r'[^\x00-\x7f]', r' ', resume_text)
         resume_text = re.sub('\s+', ' ', resume_text)
         resume_text = resume_text.lower()
-        resume_text_tokens = word_tokenize(resume_text)
-        filtered_text = [
-            w for w in resume_text_tokens if not w in stopwords_set]
-        return ' '.join(filtered_text)
+        return resume_text
     except:
         return ''
 
