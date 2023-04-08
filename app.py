@@ -43,16 +43,18 @@ class predictBody(BaseModel):
 
 def transform(data: str):
     clean_data = clean_text(data)
+    print(data)
     data_sequence = feature_tokenizer.texts_to_sequences([clean_data])
     data_padded = pad_sequences(
         data_sequence, maxlen=max_length, padding=pad_type, truncating=trunc_type)
+    print(data_padded)
+
     return np.array(data_padded)
 
 
 @app.post('/predict')
 def predict_cv(predictBody: predictBody):
-    print(predictBody.resume)
-    print(predictBody.skill)
+
     resume_padded = transform(predictBody.resume)
     skill_padded = transform(predictBody.skill)
     print(resume_padded)
