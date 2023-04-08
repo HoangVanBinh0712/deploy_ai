@@ -35,6 +35,7 @@ feature_tokenizer = pickle.load(feature_tokenizer_in)
 encoding_to_label_in = open("dictionary.pickle", "rb")
 encoding_to_label = pickle.load(encoding_to_label_in)
 
+
 class predictBody(BaseModel):
     resume: str
     skill: str
@@ -50,10 +51,10 @@ def transform(data: str):
 
 @app.post('/predict')
 def predict_cv(predictBody: predictBody):
-    print(predictBody)
     resume_padded = transform(predictBody.resume)
     skill_padded = transform(predictBody.skill)
-
+    print(resume_padded)
+    print(skill_padded)
     # predict
     prediction = filterCV.predict((resume_padded, skill_padded))
 
@@ -61,7 +62,6 @@ def predict_cv(predictBody: predictBody):
     indices = np.argpartition(prediction[0], -5)[-5:]
     indices = indices[np.argsort(prediction[0][indices])]
     indices = list(reversed(indices))
-
 
     # Concat data to return
     result_data = []
