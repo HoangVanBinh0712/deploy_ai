@@ -51,6 +51,8 @@ def transform(data: str):
 
 @app.post('/predict')
 def predict_cv(predictBody: predictBody):
+    print(predictBody.resume)
+    print(predictBody.skill)
     resume_padded = transform(predictBody.resume)
     skill_padded = transform(predictBody.skill)
     print(resume_padded)
