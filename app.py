@@ -43,8 +43,8 @@ class predictBody(BaseModel):
 
 def transform(data: str):
     clean_data = clean_text(data)
-    print(data)
     data_sequence = feature_tokenizer.texts_to_sequences([clean_data])
+    print(data_sequence)
     data_padded = pad_sequences(
         data_sequence, maxlen=max_length, padding=pad_type, truncating=trunc_type)
     print(data_padded)
