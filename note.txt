@@ -1,0 +1,4 @@
+Run: uvicorn app:app --reload
+
+
+Git config: git config --global core.autocrlf false
