@@ -27,9 +27,7 @@ stopwords_set = set(stopwords_set)
 max_length = 800
 trunc_type = 'post'
 pad_type = 'post'
-# load feature_tokenizer to transfer data to number array
-feature_tokenizer_in = open("feature_tokenizer.pickle", "rb")
-feature_tokenizer = pickle.load(feature_tokenizer_in)
+
 
 # Load the lable
 encoding_to_label_in = open("dictionary.pickle", "rb")
@@ -42,7 +40,11 @@ class predictBody(BaseModel):
 
 
 def transform(data: str):
+    # load feature_tokenizer to transfer data to number array
+    feature_tokenizer_in = open("feature_tokenizer.pickle", "rb")
+    feature_tokenizer = pickle.load(feature_tokenizer_in)
     clean_data = clean_text(data)
+    print(clean_data)
     data_sequence = feature_tokenizer.texts_to_sequences([clean_data])
     print(data_sequence)
     data_padded = pad_sequences(
@@ -57,8 +59,6 @@ def predict_cv(predictBody: predictBody):
 
     resume_padded = transform(predictBody.resume)
     skill_padded = transform(predictBody.skill)
-    print(resume_padded)
-    print(skill_padded)
     # predict
     prediction = filterCV.predict((resume_padded, skill_padded))
 
