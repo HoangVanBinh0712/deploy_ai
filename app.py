@@ -30,9 +30,11 @@ pad_type = 'post'
 
 
 # Load the lable
-encoding_to_label_in = open("dictionary.pickle", "rb")
+encoding_to_label_in = open("./dictionary.pickle", "rb")
 encoding_to_label = pickle.load(encoding_to_label_in)
-
+# load feature_tokenizer to transfer data to number array
+feature_tokenizer_in = open("./feature_tokenizer.pickle", "rb")
+feature_tokenizer = pickle.load(feature_tokenizer_in)
 
 class predictBody(BaseModel):
     resume: str
@@ -40,11 +42,12 @@ class predictBody(BaseModel):
 
 
 def transform(data: str):
-    # load feature_tokenizer to transfer data to number array
-    feature_tokenizer_in = open("feature_tokenizer.pickle", "rb")
-    feature_tokenizer = pickle.load(feature_tokenizer_in)
+    print(feature_tokenizer)
     clean_data = clean_text(data)
+    print(clean_data)
     data_sequence = feature_tokenizer.texts_to_sequences([clean_data])
+    print(data_sequence)
+
     data_padded = pad_sequences(
         data_sequence, maxlen=max_length, padding=pad_type, truncating=trunc_type)
 
